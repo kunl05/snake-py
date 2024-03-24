@@ -2,18 +2,33 @@ import pygame
 from pygame.locals import *
 import time
 
+size = 45
+
+class food:
+    def __init__(self, parent_screen):
+        self.image = pygame.image.load("pic/khao.png").convert()
+        self.parent_screen = parent_screen
+        self.x = size*3
+        self.y = size*3
+
+    def draw(self):
+        self.parent_screen.blit(self.image,(self.x,self.y))
+        pygame.display.flip()
+
 
 class Snake:
-    def __init__(self, surface):
-        self.parent_screen = surface
+    def __init__(self, parent_screen,length):
+        self.length = length
+        self.parent_screen = parent_screen
         self.block = pygame.image.load("pic/bl.png").convert()
-        self.x = 100
-        self.y = 100
+        self.x = [size]*length
+        self.y = [size]*length
         self.direction = "down"
 
     def draw(self):
         self.parent_screen.fill((238,168,73))
-        self.parent_screen.blit(self.block,(self.x,self.y))
+        for i in range(self.length):
+            self.parent_screen.blit(self.block,(self.x[i],self.y[i]))
         pygame.display.flip()
 
     def move_up(self):
@@ -32,15 +47,18 @@ class Snake:
 
 
     def walk(self):
-        if self.direction == "up":
-            self.y -=10
-        if self.direction == "down":
-            self.y +=10
-        if self.direction == "left":
-            self.x -=10
-        if self.direction == "right":
-            self.x +=10
+        for i in range(self.length-1,0,-1):
+            self.x[i] = self.x[i-1]
+            self.y[i] = self.y[i-1]
 
+        if self.direction == "up":
+            self.y[0] -= size
+        if self.direction == "down":
+            self.y[0] += size
+        if self.direction == "left":
+            self.x[0] -= size
+        if self.direction == "right":
+            self.x[0] += size 
         self.draw()
 
         
@@ -50,10 +68,20 @@ class Snake:
 class Game:
     def __init__(self):
         pygame.init()
-        self.surface = pygame.display.set_mode((1000,500))
+        self.surface = pygame.display.set_mode((900,600))
         self.surface.fill((95,94,5))
-        self.snake = Snake(self.surface)
+        self.snake = Snake(self.surface,6)
         self.snake.draw()
+        self.food = food(self.surface)
+        self.food.draw()
+
+    def collision(self, x1,y1,x2,y2):
+        pass
+
+
+    def play(self):
+        self.snake.walk()
+        self.food.draw()
 
     def run(self):
         running = True
@@ -80,8 +108,8 @@ class Game:
                     running = False
 
 
-            self.snake.walk()
-            time.sleep(0.2)
+            time.sleep(.3)
+            self.play()
 
         
 
